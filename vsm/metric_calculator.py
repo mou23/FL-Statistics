@@ -1,36 +1,26 @@
 import sys
 import csv
-from bug_data_processor import get_bug_data
+import json
 
-project = sys.argv[1] # 'aspectj'
-result_directory = sys.argv[2] #'../../dataset/temp/BL_test_run_2/recommended'
-bug_report_file = sys.argv[3] #'../../dataset/aspectj-filtered.xml'
-typ = sys.argv[4]
-bug_data = get_bug_data(bug_report_file, result_directory)
-
-
-def calculate_reciprocal_rank_at_k(project, typ):
+def calculate_mean_reciprocal_rank_at_k(project, data, typ):
     results = {}
-
     for top in [10, 20, 30]: #, 40, 50]:
-        for current_bug_data in bug_data:
-            bug_id = current_bug_data['bug_id']
-            suspicious_files = current_bug_data['suspicious_files'].split(",")
-            length_of_suspicious_files = len(suspicious_files)
-            fixed_files = current_bug_data['files'].split('.java')
-            fixed_files = [(file + '.java').strip() for file in fixed_files[:-1]]
-            minimum_length = min(top, length_of_suspicious_files)
+        for key, value in data.items():
+            bug_id = key
             inverse_rank = 0
-            
+            suspicious_files = value['results']
+            length_of_suspicious_files = len(suspicious_files)
+            fixed_files = value['truth']
+            minimum_length = min(top,length_of_suspicious_files)
             for i in range(minimum_length):
-                if suspicious_files[i] in fixed_files:
-                    inverse_rank = 1 / (i + 1)
+                if(suspicious_files[i] in fixed_files):
+                    inverse_rank = (1/(i+1))
                     break
-            
-            if bug_id not in results:
-                results[bug_id] = {}
-            results[bug_id][top] = inverse_rank
 
+        if bug_id not in results:
+            results[bug_id] = {}
+        results[bug_id][top] = inverse_rank
+    
     with open(project+'-' + typ + '-reciprocal-rank.csv', mode='w', newline='') as csv_file:
         fieldnames = ['Bug ID'] + [f'Top-{top}' for top in [10, 20, 30]]
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
@@ -43,20 +33,18 @@ def calculate_reciprocal_rank_at_k(project, typ):
             writer.writerow(row)
 
 
-def calculate_average_precision_at_k(project, typ):
+def calculate_mean_average_precision_at_k(data):
     results = {}
-
     for top in [10, 20, 30]: #, 40, 50]:
-        for current_bug_data in bug_data:
-            bug_id = current_bug_data['bug_id']
-            suspicious_files = current_bug_data['suspicious_files'].split(",")
-            length_of_suspicious_files = len(suspicious_files)
-            fixed_files = current_bug_data['files'].split('.java')
-            fixed_files = [(file + '.java').strip() for file in fixed_files[:-1]]
-            number_of_relevant_files = 0
-            precision = 0
+        for key, value in data.items():
+            bug_id = key
             average_precision = 0
-            minimum_length = min(top, length_of_suspicious_files)
+            precision = 0
+            suspicious_files = value['results']
+            length_of_suspicious_files = len(suspicious_files)
+            fixed_files = value['truth']
+            number_of_relevant_files = 0
+            minimum_length = min(top,length_of_suspicious_files)
             
             for i in range(minimum_length):
                 if suspicious_files[i] in fixed_files:
@@ -82,5 +70,10 @@ def calculate_average_precision_at_k(project, typ):
             writer.writerow(row)
 
 
-calculate_reciprocal_rank_at_k(project, typ)
-calculate_average_precision_at_k(project, typ)
+project = sys.argv[1]
+typ = sys.argv[2]     
+with open(project+'/results.json', 'r') as file:
+    data = json.load(file)
+
+calculate_mean_reciprocal_rank_at_k(project, data, typ)
+calculate_mean_average_precision_at_k(project, data, typ)
