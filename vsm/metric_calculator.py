@@ -33,7 +33,7 @@ def calculate_mean_reciprocal_rank_at_k(project, data, typ):
             writer.writerow(row)
 
 
-def calculate_mean_average_precision_at_k(data):
+def calculate_mean_average_precision_at_k(project, data, typ):
     results = {}
     for top in [10, 20, 30]: #, 40, 50]:
         for key, value in data.items():
