@@ -71,8 +71,9 @@ def calculate_mean_average_precision_at_k(data):
 
 
 project = sys.argv[1]
-typ = sys.argv[2]     
-with open(project+'/results.json', 'r') as file:
+result_directory = sys.argv[2]
+typ = sys.argv[3]     
+with open(result_directory +'/results.json', 'r') as file:
     data = json.load(file)
 
 calculate_mean_reciprocal_rank_at_k(project, data, typ)
