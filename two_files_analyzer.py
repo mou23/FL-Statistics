@@ -2,7 +2,7 @@ import sys
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.stats import ttest_ind, mannwhitneyu, shapiro, probplot
+from scipy.stats import ttest_ind, mannwhitneyu, shapiro, probplot, levene, ks_2samp
 
 def get_descriptive_statistics(values1, values2, col):
     print(f"********************Descriptive Statistics: for {col}********************")
@@ -50,8 +50,42 @@ def create_qq_plot(project, values1, values2, col):
     plt.savefig(project + '-' + col + '-qq-plot.png', dpi=300)
     plt.close()
 
+    
+def check_distribution(values1, values2, col):
+    print(f"********************Distribution Result for {col}********************")
+    values1 = np.array(values1)
+    values2 = np.array(values2)
+
+    if len(values1) < 3 or len(values2) < 3:
+        print("Warning: Sample size too small for distribution tests.")
+        return
+    
+    levene_stat, levene_p = levene(values1, values2)
+    print(f"Levene’s Test: statistic = {levene_stat}, p-value = {levene_p}")
+    if levene_p>0.05:
+        print('similar distributions for Levene’s Test')
+    else:
+        print('different distributions for Levene’s Test')
+    ks_stat, ks_p_value = ks_2samp(values1, values2)
+    print(f"KS Test: statistic = {ks_stat}, p-value = {ks_p_value}")
+
+    if ks_p_value>0.05:
+        print('similar distributions for KS Test')
+    else:
+        print('different distributions for KS Test')
+
+def interpret_effect_size(r):
+    if r < 0.1:
+        return "negligible"
+    elif r < 0.3:
+        return "small"
+    elif r < 0.5:
+        return "medium"
+    else:
+        return "large"
+    
 def check_significance(values1, values2, col):
-    print(f"********************Result for {col}********************")
+    print(f"********************Significance Result for {col}********************")
     values1 = np.array(values1)
     values2 = np.array(values2)
 
@@ -68,7 +102,16 @@ def check_significance(values1, values2, col):
         print(f"T-Test: t-statistic = {t_stat}, p-value = {t_p_value}")
     else:
         u_stat, u_p_value = mannwhitneyu(values1, values2, alternative='two-sided')
+        n1 = len(values1)
+        n2 = len(values2)
+        n = n1 + n2
+        # Convert U to z-score
+        z = (u_stat - (n1 * n2 / 2)) / np.sqrt((n1 * n2 * (n + 1)) / 12)
+        # Calculate effect size r
+        r = abs(z) / np.sqrt(n)
         print(f"Mann-Whitney U Test: U-statistic = {u_stat}, p-value = {u_p_value}")
+        print(f"Effect size (r) = {r:.3f}")
+        print(f"Effect size interpretation: {interpret_effect_size(r)}")
 
     alpha = 0.05
     if (p_value1 > 0.05 and p_value2 > 0.05 and t_p_value < alpha) or ((p_value1 <= 0.05 or p_value2 <= 0.05) and u_p_value < alpha):
@@ -93,6 +136,7 @@ def analyze_files(project, file1, file2):
         get_descriptive_statistics(values1, values2, col)
         create_histogram(project, values1, values2, col)
         create_qq_plot(project, values1, values2, col)
+        check_distribution(values1, values2, col)
         check_significance(values1, values2, col)
 
 project = sys.argv[1]
