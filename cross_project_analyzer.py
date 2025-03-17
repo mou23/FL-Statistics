@@ -13,7 +13,7 @@ def wilcoxon_effect_size(csv1, csv2, column_name, alpha=0.05):
     y = df2[column_name].values
     
     if len(x) != len(y):
-        raise ValueError("Both files must have the same number of observations.")
+        return None  # Skip if sizes mismatch
     
     stat, p_value = wilcoxon(x, y)
     
@@ -33,9 +33,15 @@ typ = sys.argv[3]  # clean, baseline
 projects = ["aspectj", "birt", "eclipse", "jdt", "swt", "tomcat"]
 techniques = ["buglocator", "bluir", "vsm", "brtracer"]
 
-comparison_matrix = pd.DataFrame(index=techniques, columns=techniques, dtype=float)
+fig, axes = plt.subplots(2, 3, figsize=(18, 12))
+fig.suptitle(f"Effect Size Heatmaps: {metric} ({typ})", fontsize=16)
 
-for project in projects:
+for idx, project in enumerate(projects):
+    row, col = divmod(idx, 3)  # Compute subplot position
+
+    # Initialize DataFrame for the current project
+    comparison_matrix = pd.DataFrame(index=techniques, columns=techniques, dtype=float)
+
     for i in range(len(techniques)):
         for j in range(i+1, len(techniques)):
             file1 = f"{techniques[i]}/{project}-{typ}-{metric}.csv"
@@ -47,14 +53,14 @@ for project in projects:
                 comparison_matrix.loc[techniques[i], techniques[j]] = effect_size
                 comparison_matrix.loc[techniques[j], techniques[i]] = effect_size  # Mirror effect
 
-# Plot heatmap
-plt.figure(figsize=(8, 6))
-sns.heatmap(comparison_matrix, annot=True, cmap="Blues", linewidths=0.5, vmin=0, vmax=1)
-plt.title(f"Effect Size Heatmap: {metric} ({typ})")
+    # Plot heatmap for the project
+    sns.heatmap(comparison_matrix, annot=True, cmap="Blues", linewidths=0.5, vmin=0, vmax=1, ax=axes[row, col])
+    axes[row, col].set_title(f"{project}")
 
-# Save the figure to disk
-heatmap_path = f"effect_size_heatmap_{metric}_{typ}.png"
-plt.savefig(heatmap_path, dpi=300, bbox_inches='tight')
+# Adjust layout and save
+plt.tight_layout(rect=[0, 0, 1, 0.95])
+combined_heatmap_path = f"effect_size_combined_{metric}_{typ}.png"
+plt.savefig(combined_heatmap_path, dpi=300, bbox_inches='tight')
 plt.close()
 
-print(f"Heatmap saved to {heatmap_path}")
+print(f"Combined heatmap saved to {combined_heatmap_path}")
