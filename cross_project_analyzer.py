@@ -30,9 +30,9 @@ def wilcoxon_effect_size(csv1, csv2, column_name, alpha=0.05):
     else:
         effect_size_desc = "Large"
 
-    print(f"Wilcoxon Statistic: {stat:.4f}")
-    print(f"p-value: {p_value:.4e} ({significance})")
-    print(f"Effect Size (r): {r:.4f} ({effect_size_desc})")
+    # print(f"Wilcoxon Statistic: {stat:.4f}")
+    # print(f"p-value: {p_value:.4e} ({significance})")
+    # print(f"Effect Size (r): {r:.4f} ({effect_size_desc})")
     
     return {"Wilcoxon Statistic": stat, "p-value": p_value, "Effect Size (r)": r, "Significance": significance, "Effect Size Description": effect_size_desc}
 
