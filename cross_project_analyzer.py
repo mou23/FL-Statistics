@@ -1,7 +1,9 @@
 import pandas as pd
 import numpy as np
-from scipy.stats import wilcoxon, norm
+import seaborn as sns
+import matplotlib.pyplot as plt
 import sys
+from scipy.stats import wilcoxon, norm
 
 def wilcoxon_effect_size(csv1, csv2, column_name, alpha=0.05):
     df1 = pd.read_csv(csv1)
@@ -15,35 +17,23 @@ def wilcoxon_effect_size(csv1, csv2, column_name, alpha=0.05):
     
     stat, p_value = wilcoxon(x, y)
     
-    N = len(x)  # Number of pairs
-    z = norm.ppf(1 - p_value / 2)  # Approximate Z-score
-    r = z / np.sqrt(N)
+    N = len(x)
+    if p_value == 0:
+        p_value = 1e-10  # Avoid log(0) errors
     
-    significance = "Significant" if p_value < alpha else "Not Significant"
+    z = norm.ppf(1 - p_value / 2)  
+    r = z / np.sqrt(N)  # Effect size
     
-    if r < 0.1:
-        effect_size_desc = "Negligible"
-    elif r < 0.3:
-        effect_size_desc = "Small"
-    elif r < 0.5:
-        effect_size_desc = "Medium"
-    else:
-        effect_size_desc = "Large"
+    return r
 
-    # print(f"Wilcoxon Statistic: {stat:.4f}")
-    # print(f"p-value: {p_value:.4e} ({significance})")
-    # print(f"Effect Size (r): {r:.4f} ({effect_size_desc})")
-    
-    return {"Wilcoxon Statistic": stat, "p-value": p_value, "Effect Size (r)": r, "Significance": significance, "Effect Size Description": effect_size_desc}
-
-# file1 = sys.argv[1]
-# file2 = sys.argv[2]
-column = sys.argv[1] # Top-10
-metric = sys.argv[2] # average-precision, reciprocal-rank
-typ = sys.argv[3] # clean, baseline
+column = sys.argv[1]  # Top-10
+metric = sys.argv[2]  # average-precision, reciprocal-rank
+typ = sys.argv[3]  # clean, baseline
 
 projects = ["aspectj", "birt", "eclipse", "jdt", "swt", "tomcat"]
 techniques = ["buglocator", "bluir", "vsm", "brtracer"]
+
+comparison_matrix = pd.DataFrame(index=techniques, columns=techniques, dtype=float)
 
 for project in projects:
     for i in range(len(techniques)):
@@ -51,9 +41,20 @@ for project in projects:
             file1 = f"{techniques[i]}/{project}-{typ}-{metric}.csv"
             file2 = f"{techniques[j]}/{project}-{typ}-{metric}.csv"
 
-            id = f"{project}-{techniques[i]}-{techniques[j]}-{metric}-{typ}-{column}"
-            result = wilcoxon_effect_size(file1, file2, column)
+            effect_size = wilcoxon_effect_size(file1, file2, column)
+            
+            if effect_size is not None:
+                comparison_matrix.loc[techniques[i], techniques[j]] = effect_size
+                comparison_matrix.loc[techniques[j], techniques[i]] = effect_size  # Mirror effect
 
-            print(" ***** ")
-            print(id, result)
-            print()
+# Plot heatmap
+plt.figure(figsize=(8, 6))
+sns.heatmap(comparison_matrix, annot=True, cmap="Blues", linewidths=0.5, vmin=0, vmax=1)
+plt.title(f"Effect Size Heatmap: {metric} ({typ})")
+
+# Save the figure to disk
+heatmap_path = f"effect_size_heatmap_{metric}_{typ}.png"
+plt.savefig(heatmap_path, dpi=300, bbox_inches='tight')
+plt.close()
+
+print(f"Heatmap saved to {heatmap_path}")
