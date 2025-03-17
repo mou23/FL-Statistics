@@ -109,7 +109,7 @@ for idx, project in enumerate(projects):
 
 # Adjust layout and save
 plt.tight_layout(rect=[0, 0, 1, 0.95])
-combined_heatmap_path = f"effect_size_combined_{metric}_{typ}.png"
+combined_heatmap_path = f"effect_size_combined_{column}_{metric}_{typ}.png"
 plt.savefig(combined_heatmap_path, dpi=300, bbox_inches='tight')
 plt.close()
 
