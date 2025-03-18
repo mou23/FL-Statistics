@@ -8,11 +8,12 @@ bug_report_file = sys.argv[3] #'../../dataset/aspectj-filtered.xml'
 typ = sys.argv[4]
 bug_data = get_bug_data(bug_report_file, result_directory)
 
+arr = [10, 30, 50]
 
 def calculate_reciprocal_rank_at_k(project, typ):
     results = {}
 
-    for top in [10, 20, 30]: #, 40, 50]:
+    for top in arr: #, 40, 50]:
         for current_bug_data in bug_data:
             bug_id = current_bug_data['bug_id']
             suspicious_files = current_bug_data['suspicious_files'].split(",")
@@ -32,14 +33,14 @@ def calculate_reciprocal_rank_at_k(project, typ):
             results[bug_id][top] = inverse_rank
 
     with open(project+'-' + typ + '-reciprocal-rank.csv', mode='w', newline='') as csv_file:
-        fieldnames = ['Bug ID'] + [f'Top-{top}' for top in [10, 20, 30]]
+        fieldnames = ['Bug ID'] + [f'Top-{top}' for top in arr]
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
         
         writer.writeheader()
         
         for bug_id, ranks in results.items():
             row = {'Bug ID': bug_id}
-            row.update({f'Top-{top}': ranks.get(top, 0) for top in [10, 20, 30]})
+            row.update({f'Top-{top}': ranks.get(top, 0) for top in arr})
             writer.writerow(row)
 
 
@@ -48,7 +49,7 @@ def calculate_average_precision_at_k(project, typ):
     results = {}
 
     # Iterate over different top values
-    for top in [10, 20, 30]: #, 40, 50]:
+    for top in arr: #, 40, 50]:
         for current_bug_data in bug_data:
             bug_id = current_bug_data['bug_id']
             suspicious_files = current_bug_data['suspicious_files'].split(",")
@@ -73,14 +74,14 @@ def calculate_average_precision_at_k(project, typ):
             results[bug_id][top] = average_precision
 
     with open(project+'-'+ typ +'-average-precision.csv', mode='w', newline='') as csv_file:
-        fieldnames = ['Bug ID'] + [f'Top-{top}' for top in [10, 20, 30]]
+        fieldnames = ['Bug ID'] + [f'Top-{top}' for top in arr]
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
         
         writer.writeheader()  
         
         for bug_id, precisions in results.items():
             row = {'Bug ID': bug_id}
-            row.update({f'Top-{top}': precisions.get(top, 0) for top in [10, 20, 30]})
+            row.update({f'Top-{top}': precisions.get(top, 0) for top in arr})
             writer.writerow(row)
 
 

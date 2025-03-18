@@ -2,9 +2,11 @@ import sys
 import csv
 import json
 
+arr = [10, 30, 50]
+
 def calculate_mean_reciprocal_rank_at_k(project, data, typ):
     results = {}
-    for top in [10, 20, 30]: #, 40, 50]:
+    for top in arr: #, 40, 50]:
         for key, value in data.items():
             bug_id = key
             inverse_rank = 0
@@ -22,20 +24,20 @@ def calculate_mean_reciprocal_rank_at_k(project, data, typ):
         results[bug_id][top] = inverse_rank
     
     with open(project+'-' + typ + '-reciprocal-rank.csv', mode='w', newline='') as csv_file:
-        fieldnames = ['Bug ID'] + [f'Top-{top}' for top in [10, 20, 30]]
+        fieldnames = ['Bug ID'] + [f'Top-{top}' for top in arr]
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
         
         writer.writeheader()
         
         for bug_id, ranks in results.items():
             row = {'Bug ID': bug_id}
-            row.update({f'Top-{top}': ranks.get(top, 0) for top in [10, 20, 30]})
+            row.update({f'Top-{top}': ranks.get(top, 0) for top in arr})
             writer.writerow(row)
 
 
 def calculate_mean_average_precision_at_k(project, data, typ):
     results = {}
-    for top in [10, 20, 30]: #, 40, 50]:
+    for top in arr: #, 40, 50]:
         for key, value in data.items():
             bug_id = key
             average_precision = 0
@@ -59,14 +61,14 @@ def calculate_mean_average_precision_at_k(project, data, typ):
             results[bug_id][top] = average_precision
 
     with open(project+'-'+ typ +'-average-precision.csv', mode='w', newline='') as csv_file:
-        fieldnames = ['Bug ID'] + [f'Top-{top}' for top in [10, 20, 30]]
+        fieldnames = ['Bug ID'] + [f'Top-{top}' for top in arr]
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
         
         writer.writeheader()  
         
         for bug_id, precisions in results.items():
             row = {'Bug ID': bug_id}
-            row.update({f'Top-{top}': precisions.get(top, 0) for top in [10, 20, 30]})
+            row.update({f'Top-{top}': precisions.get(top, 0) for top in arr})
             writer.writerow(row)
 
 
