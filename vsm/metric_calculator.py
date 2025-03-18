@@ -19,9 +19,9 @@ def calculate_mean_reciprocal_rank_at_k(project, data, typ):
                     inverse_rank = (1/(i+1))
                     break
 
-        if bug_id not in results:
-            results[bug_id] = {}
-        results[bug_id][top] = inverse_rank
+            if bug_id not in results:
+                results[bug_id] = {}
+            results[bug_id][top] = inverse_rank
     
     with open(project+'-' + typ + '-reciprocal-rank.csv', mode='w', newline='') as csv_file:
         fieldnames = ['Bug ID'] + [f'Top-{top}' for top in arr]
