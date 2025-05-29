@@ -10,7 +10,7 @@ index = sys.argv[5]
 bug_data = get_bug_data(bug_report_file, result_file, index)
 
 
-arr = [10]
+arr = [10,30,50]
 
 def calculate_reciprocal_rank_at_k():
     results = {}
