@@ -6,7 +6,7 @@ project = sys.argv[1]
 result_file = sys.argv[2] #'tomcat_ranked_result_mapped.csv'
 bug_report_file = sys.argv[3] #'../../dataset/tomcat-updated-data.xml'
 typ = sys.argv[4]
-index = sys.argv[5]
+index = int(sys.argv[5])
 bug_data = get_bug_data(bug_report_file, result_file, index)
 
 
