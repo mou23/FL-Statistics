@@ -9,75 +9,66 @@ typ = sys.argv[4]
 index = int(sys.argv[5])
 bug_data = get_bug_data(bug_report_file, result_file, index)
 
-
-arr = [10,30,50]
-
-def calculate_reciprocal_rank_at_k():
+def calculate_reciprocal_rank(project, typ):
     results = {}
 
-    for top in arr:
-        for current_bug_data in bug_data:
-            bug_id = current_bug_data['bug_id']
-            suspicious_files = current_bug_data['suspicious_files'].split(",")
-            fixed_files = current_bug_data['fixed_files'].split('.java')
-            fixed_files = [(file + '.java').strip() for file in fixed_files[:-1]]
-            minimum_length = min(top, len(suspicious_files))
-            inverse_rank = 0
+    for current_bug_data in bug_data:
+        bug_id = current_bug_data['bug_id']
+        suspicious_files = current_bug_data['suspicious_files'].split(",")
+        length_of_suspicious_files = len(suspicious_files)
+        fixed_files = current_bug_data['files'].split('.java')
+        fixed_files = [(file + '.java').strip() for file in fixed_files[:-1]]
+        
+        inverse_rank = 0
+        for i in range(length_of_suspicious_files):
+            if suspicious_files[i] in fixed_files:
+                inverse_rank = 1 / (i + 1)
+                break
+        
+        results[bug_id] = inverse_rank
 
-            for i in range(minimum_length):
-                if suspicious_files[i] in fixed_files:
-                    inverse_rank = 1 / (i + 1)
-                    break
-
-            if bug_id not in results:
-                results[bug_id] = {}
-            results[bug_id][top] = inverse_rank
-
-    with open(f"{project}-{typ}-reciprocal-rank.csv", mode='w', newline='') as csv_file:
-        fieldnames = ['Bug ID'] + [f'Top-{top}' for top in arr]
+    output_file = f"{project}-{typ}-reciprocal-rank.csv"
+    with open(output_file, mode='w', newline='') as csv_file:
+        fieldnames = ['Bug ID', 'Reciprocal Rank']
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
         writer.writeheader()
 
-        for bug_id, ranks in results.items():
-            row = {'Bug ID': bug_id}
-            row.update({f'Top-{top}': round(ranks.get(top, 0), 3) for top in arr})
-            writer.writerow(row)
+        for bug_id, rr in results.items():
+            writer.writerow({'Bug ID': bug_id, 'Reciprocal Rank': rr})
 
-
-def calculate_average_precision_at_k():
+def calculate_average_precision(project, typ):
     results = {}
 
-    for top in arr:
-        for current_bug_data in bug_data:
-            bug_id = current_bug_data['bug_id']
-            suspicious_files = current_bug_data['suspicious_files'].split(",")
-            fixed_files = current_bug_data['fixed_files'].split('.java')
-            fixed_files = [(file + '.java').strip() for file in fixed_files[:-1]]
-            number_of_relevant_files = 0
-            precision_sum = 0
-            minimum_length = min(top, len(suspicious_files))
+    for current_bug_data in bug_data:
+        bug_id = current_bug_data['bug_id']
+        suspicious_files = current_bug_data['suspicious_files'].split(",")
+        fixed_files = current_bug_data['files'].split('.java')
+        fixed_files = [(file + '.java').strip() for file in fixed_files[:-1]]
+        
+        number_of_relevant_files = 0
+        precision_sum = 0
 
-            for i in range(minimum_length):
-                if suspicious_files[i] in fixed_files:
-                    number_of_relevant_files += 1
-                    precision_sum += (number_of_relevant_files / (i + 1))
+        for i, file in enumerate(suspicious_files):
+            if file in fixed_files:
+                number_of_relevant_files += 1
+                precision_sum += number_of_relevant_files / (i + 1)
 
-            average_precision = precision_sum / len(fixed_files) if fixed_files else 0
+        if fixed_files:
+            average_precision = precision_sum / len(fixed_files)
+        else:
+            average_precision = 0
 
-            if bug_id not in results:
-                results[bug_id] = {}
-            results[bug_id][top] = average_precision
+        results[bug_id] = average_precision
 
-    with open(f"{project}-{typ}-average-precision.csv", mode='w', newline='') as csv_file:
-        fieldnames = ['Bug ID'] + [f'Top-{top}' for top in arr]
+    output_file = f"{project}-{typ}-average-precision.csv"
+    with open(output_file, mode='w', newline='') as csv_file:
+        fieldnames = ['Bug ID', 'Average Precision']
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
         writer.writeheader()
 
-        for bug_id, precisions in results.items():
-            row = {'Bug ID': bug_id}
-            row.update({f'Top-{top}': round(precisions.get(top, 0), 3) for top in arr})
-            writer.writerow(row)
+        for bug_id, ap in results.items():
+            writer.writerow({'Bug ID': bug_id, 'Average Precision': ap})
 
 
-calculate_reciprocal_rank_at_k()
-calculate_average_precision_at_k()
+calculate_reciprocal_rank(project, typ)
+calculate_average_precision(project, typ)

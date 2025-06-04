@@ -15,7 +15,7 @@ def get_bug_data(xml_path,result_file, index=0):
         
         bug_data = {"bug_id": bug_id,
                     "fixed_commit_time": fixed_commit_time, 
-                    "fixed_files": fixed_files}
+                    "files": fixed_files}
         bugs.append(bug_data)
 
     bugs = sorted(bugs, key=lambda d: d['fixed_commit_time'])

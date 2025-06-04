@@ -19,7 +19,7 @@ def create_csv():
         total_bug = 0
         for current_bug_data in bug_data:
             suspicious_files = current_bug_data['suspicious_files'].split(",")
-            fixed_files = current_bug_data['fixed_files'].split('.java')
+            fixed_files = current_bug_data['files'].split('.java')
             fixed_files = [(file + '.java').strip() for file in fixed_files[:-1]]
             
             for fixed_file in fixed_files:
