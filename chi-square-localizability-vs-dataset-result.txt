@@ -1,0 +1,119 @@
+
+Analyzing BUGLOCATOR:
+--------------------------------------------------
+
+Contingency Table:
+is_bug     False  True   All
+localized                   
+False       1238  2804  4042
+True        1946  3109  5055
+All         3184  5913  9097
+
+Chi-square statistic: 60.7740
+p-value: 0.0000
+Degrees of freedom: 1
+Phi coefficient: 0.0817
+
+Localization Statistics:
+Total cases: 9097
+Total bugs: 5913
+Total non-bugs: 3184
+Localized bugs: 3109 (52.6%)
+Localized non-bugs: 1946 (61.1%)
+
+Analyzing BLUIR:
+--------------------------------------------------
+
+Contingency Table:
+is_bug     False  True   All
+localized                   
+False       1130  2681  3811
+True        2054  3232  5286
+All         3184  5913  9097
+
+Chi-square statistic: 82.0966
+p-value: 0.0000
+Degrees of freedom: 1
+Phi coefficient: 0.0950
+
+Localization Statistics:
+Total cases: 9097
+Total bugs: 5913
+Total non-bugs: 3184
+Localized bugs: 3232 (54.7%)
+Localized non-bugs: 2054 (64.5%)
+
+Analyzing VSM:
+--------------------------------------------------
+
+Contingency Table:
+is_bug     False  True   All
+localized                   
+False       2650  5340  7990
+True         534   573  1107
+All         3184  5913  9097
+
+Chi-square statistic: 96.4242
+p-value: 0.0000
+Degrees of freedom: 1
+Phi coefficient: 0.1030
+
+Localization Statistics:
+Total cases: 9097
+Total bugs: 5913
+Total non-bugs: 3184
+Localized bugs: 573 (9.7%)
+Localized non-bugs: 534 (16.8%)
+
+Analyzing BRTRACER:
+--------------------------------------------------
+
+Contingency Table:
+is_bug     False  True   All
+localized                   
+False       1156  2658  3814
+True        2028  3255  5283
+All         3184  5913  9097
+
+Chi-square statistic: 63.1748
+p-value: 0.0000
+Degrees of freedom: 1
+Phi coefficient: 0.0833
+
+Localization Statistics:
+Total cases: 9097
+Total bugs: 5913
+Total non-bugs: 3184
+Localized bugs: 3255 (55.0%)
+Localized non-bugs: 2028 (63.7%)
+
+Analyzing DREAMLOC:
+--------------------------------------------------
+
+Contingency Table:
+is_bug     False  True   All
+localized                   
+False       1043  2165  3208
+True        2141  3748  5889
+All         3184  5913  9097
+
+Chi-square statistic: 13.3161
+p-value: 0.0003
+Degrees of freedom: 1
+Phi coefficient: 0.0383
+
+Localization Statistics:
+Total cases: 9097
+Total bugs: 5913
+Total non-bugs: 3184
+Localized bugs: 3748 (63.4%)
+Localized non-bugs: 2141 (67.2%)
+
+Summary of Chi-square Tests:
+==================================================
+ Technique  Chi-square      p-value  Phi Coefficient Significant Bug Localization % Non-Bug Localization %
+buglocator   60.773954 6.401936e-15         0.081735         Yes              52.6%                  61.1%
+     bluir   82.096635 1.295930e-19         0.094998         Yes              54.7%                  64.5%
+       vsm   96.424231 9.272536e-23         0.102954         Yes               9.7%                  16.8%
+  brtracer   63.174833 1.891497e-15         0.083334         Yes              55.0%                  63.7%
+  dreamloc   13.316105 2.631362e-04         0.038260         Yes              63.4%                  67.2%
