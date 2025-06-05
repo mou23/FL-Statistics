@@ -15,7 +15,7 @@ def calculate_mean_reciprocal_rank(project, data, typ):
                 break
         results[bug_id] = inverse_rank
 
-    with open(f"{project}-{typ}-reciprocal-rank-full.csv", mode='w', newline='') as csv_file:
+    with open(f"{project}-{typ}-reciprocal-rank.csv", mode='w', newline='') as csv_file:
         fieldnames = ['Bug ID', 'Reciprocal Rank']
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
         writer.writeheader()
@@ -45,7 +45,7 @@ def calculate_mean_average_precision(project, data, typ):
 
         results[bug_id] = average_precision
 
-    with open(f"{project}-{typ}-average-precision-full.csv", mode='w', newline='') as csv_file:
+    with open(f"{project}-{typ}-average-precision.csv", mode='w', newline='') as csv_file:
         fieldnames = ['Bug ID', 'Average Precision']
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
         writer.writeheader()
