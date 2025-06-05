@@ -129,8 +129,8 @@ def analyze_files(project, file1, file2):
         return
 
     for col in common_columns:
-        if col != "Top-10":
-            continue
+        # if col != "Top-10":
+        #     continue
         print(f"\n*** Analysis for Column: {col} ***\n")
         values1 = data1[col].dropna()
         values2 = data2[col].dropna()
