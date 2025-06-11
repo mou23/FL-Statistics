@@ -58,7 +58,7 @@ def effect_size_interpretation(effect_size):
     else:
         return "Very Large"
 
-def func1(df1, df2, common):
+def trnk2(df1, df2, common):
     nA = len(df1[~df1.iloc[:, 0].isin(common)])
     nB = len(df2[~df2.iloc[:, 0].isin(common)])
     nC = len(common)
@@ -72,29 +72,28 @@ def func1(df1, df2, common):
     X1 = sum(df1['rank']) / len(df1)
     X2 = sum(df2['rank']) / len(df2)
 
-    XA = sum(df1[~df1.iloc[:, 0].isin(common)].iloc[:, 1]) / nA
-    XB = sum(df2[~df2.iloc[:, 0].isin(common)].iloc[:, 1]) / nB
-    X1C = sum(df1[df1.iloc[:, 0].isin(common)].iloc[:, 1]) / nC
-    X2C = sum(df2[df2.iloc[:, 0].isin(common)].iloc[:, 1]) / nC
+    # XA = sum(df1[~df1.iloc[:, 0].isin(common)].iloc[:, 1]) / nA
+    # XB = sum(df2[~df2.iloc[:, 0].isin(common)].iloc[:, 1]) / nB
+    # X1C = sum(df1[df1.iloc[:, 0].isin(common)].iloc[:, 1]) / nC
+    # X2C = sum(df2[df2.iloc[:, 0].isin(common)].iloc[:, 1]) / nC
     S1_2 = stats.tvar(df1['rank'])
     S2_2 = stats.tvar(df2['rank'])
     S1 = math.sqrt(S1_2)
     S2 = math.sqrt(S2_2)
-    SA_2 = stats.tvar(df1[~df1.iloc[:, 0].isin(common)].iloc[:, 1])
-    SB_2 = stats.tvar(df2[~df2.iloc[:, 0].isin(common)].iloc[:, 1])
-    S1C_2 = stats.tvar(df1[df1.iloc[:, 0].isin(common)].iloc[:, 1])
-    S2C_2 = stats.tvar(df2[df2.iloc[:, 0].isin(common)].iloc[:, 1])
-    S12 = np.cov(df1[df1.iloc[:, 0].isin(common)].iloc[:, 1], 
-                df2[df2.iloc[:, 0].isin(common)].iloc[:, 1])[0, 1]
+    # SA_2 = stats.tvar(df1[~df1.iloc[:, 0].isin(common)].iloc[:, 1])
+    # SB_2 = stats.tvar(df2[~df2.iloc[:, 0].isin(common)].iloc[:, 1])
+    # S1C_2 = stats.tvar(df1[df1.iloc[:, 0].isin(common)].iloc[:, 1])
+    # S2C_2 = stats.tvar(df2[df2.iloc[:, 0].isin(common)].iloc[:, 1])
+    # S12 = np.cov(df1[df1.iloc[:, 0].isin(common)].iloc[:, 1], 
+    #             df2[df2.iloc[:, 0].isin(common)].iloc[:, 1])[0, 1]
     
-    v1 = (nA - 1) + ((nA + nB + nC - 1)/(nA + nB + 2 * nC)) * (nA + nB)
+    # v1 = (nA - 1) + ((nA + nB + nC - 1)/(nA + nB + 2 * nC)) * (nA + nB)
     gamma = (S1_2 / n1 + S2_2 / n2) ** 2 / ((S1_2 / n1) ** 2 / (n1 - 1) + (S2_2 / n2) ** 2 / (n2 - 1))
     v2 = (nC - 1) + ((gamma - nC + 1) / (nA + nB + 2 * nC)) * (nA + nB)
 
 
     a = df1[df1.iloc[:, 0].isin(common)].iloc[:, 1]
     b = df2[df2.iloc[:, 0].isin(common)].iloc[:, 1]
-
     r = stats.pearsonr(get_ranked_list(a), get_ranked_list(b))[0]
 
     trnk2 = (X1 - X2) / np.sqrt(S1_2 / n1 + S2_2 / n2 - 2*r * (S1 * S2 * nC) / (n1 * n2)) 
@@ -108,17 +107,19 @@ if __name__ == "__main__":
     df2 = pd.read_csv(sys.argv[2])
     common = list(set(df1.iloc[:, 0]).intersection(set(df2.iloc[:, 0])))
 
-    statistic, p_value = stats.levene(df1.iloc[:, 1], df2.iloc[:, 1])
-    print("Levene's test:")
-    print(f"Statistic: {statistic}, p-value: {p_value}")
-
-    print("Shapiro-Wilk test:")
-    print("df1:")
+    ### Shapiro-Wilk test
     statistic1, p_value1 = stats.shapiro(df1.iloc[:, 1])
-    print(f"Statistic: {statistic1}, p-value: {p_value1}")
-    print("df2:")
     statistic2, p_value2 = stats.shapiro(df2.iloc[:, 1])
-    print(f"Statistic: {statistic2}, p-value: {p_value2}")
+    print(f"Shapiro-Wilk test | df1: {f"not normally distributed | {p_value1}" if p_value1 < 0.05 else p_value1} | df2: {f"not normally distributed | {p_value2}" if p_value2 < 0.05 else p_value2}")
 
-    print("TRNK:")
-    print(func1(df1, df2, common))
+    ### Anderson-Darling test
+    statistic_ad1, critical_values1, significance_levels1 = stats.anderson(df1.iloc[:, 1])
+    statistic_ad2, critical_values2, significance_levels2 = stats.anderson(df2.iloc[:, 1])
+    print(f"Anderson-Darling test | df1: {f"not normally distributed | {statistic_ad1}" if statistic_ad1 > critical_values1[2] else statistic_ad1} | df2: {f"not normally distributed | {statistic_ad2}" if statistic_ad2 > critical_values2[2] else statistic_ad2}")
+
+    ### Levene's test
+    statistic, p_value = stats.levene(df1.iloc[:, 1], df2.iloc[:, 1])
+    print(f"Levene's test | {"Significantly different variances" if p_value < 0.05 else "Not significantly different variances"} | {p_value}")
+
+    print("TRNK2:")
+    print(trnk2(df1, df2, common))
