@@ -110,14 +110,30 @@ if __name__ == "__main__":
     ### Shapiro-Wilk test
     statistic1, p_value1 = stats.shapiro(df1.iloc[:, 1])
     statistic2, p_value2 = stats.shapiro(df2.iloc[:, 1])
-    print(f"Shapiro-Wilk test | df1: {f"not normally distributed | {p_value1}" if p_value1 < 0.05 else p_value1}")
-    print(f"Shapiro-Wilk test | df2: {f"not normally distributed | {p_value2}" if p_value2 < 0.05 else p_value2}")
+    if p_value1 < 0.05:
+        print(f"Shapiro-Wilk test | df1: not normally distributed | {p_value1}")
+    else:
+        print(f"Shapiro-Wilk test | df1: {p_value1}")
+        
+    if p_value2 < 0.05:
+        print(f"Shapiro-Wilk test | df2: not normally distributed | {p_value2}")
+    else:
+        print(f"Shapiro-Wilk test | df2: {p_value2}")
+
 
     ### Anderson-Darling test
     statistic_ad1, critical_values1, significance_levels1 = stats.anderson(df1.iloc[:, 1])
     statistic_ad2, critical_values2, significance_levels2 = stats.anderson(df2.iloc[:, 1])
-    print(f"Anderson-Darling test | df1: {f"not normally distributed | {statistic_ad1}" if statistic_ad1 > critical_values1[2] else statistic_ad1}")
-    print(f"Anderson-Darling test | df2: {f"not normally distributed | {statistic_ad2}" if statistic_ad2 > critical_values2[2] else statistic_ad2}")
+    if statistic_ad1 > critical_values1[2]:
+        print(f"Anderson-Darling test | df1: not normally distributed | {statistic_ad1}")
+    else:
+        print(f"Anderson-Darling test | df1: {statistic_ad1}")
+        
+    if statistic_ad2 > critical_values2[2]:
+        print(f"Anderson-Darling test | df2: not normally distributed | {statistic_ad2}")
+    else:
+        print(f"Anderson-Darling test | df2: {statistic_ad2}")
+
 
     ### Levene's test
     statistic, p_value = stats.levene(df1.iloc[:, 1], df2.iloc[:, 1])
