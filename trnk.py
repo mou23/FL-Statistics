@@ -99,7 +99,7 @@ def trnk2(df1, df2, common):
     p_two_tailed = stats.t.sf(abs(trnk2), v2) * 2
     effect_size = trnk2 * 2 / math.sqrt(v2)
 
-    return trnk2, p_two_tailed, effect_size_interpretation(effect_size)
+    return trnk2, p_two_tailed, effect_size_interpretation(effect_size), effect_size
 
 def trnk1(df1, df2, common):
     nA = len(df1[~df1.iloc[:, 0].isin(common)])
