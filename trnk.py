@@ -149,17 +149,17 @@ if __name__ == "__main__":
     common = list(set(df1.iloc[:, 0]).intersection(set(df2.iloc[:, 0])))
 
     ### Shapiro-Wilk test
-    statistic1, p_value1 = stats.shapiro(df1.iloc[:, 1])
-    statistic2, p_value2 = stats.shapiro(df2.iloc[:, 1])
-    if p_value1 < 0.05:
-        print(f"Shapiro-Wilk test | df1: not normally distributed | {p_value1}")
-    else:
-        print(f"Shapiro-Wilk test | df1: {p_value1}")
+    # statistic1, p_value1 = stats.shapiro(df1.iloc[:, 1])
+    # statistic2, p_value2 = stats.shapiro(df2.iloc[:, 1])
+    # if p_value1 < 0.05:
+    #     print(f"Shapiro-Wilk test | df1: not normally distributed | {p_value1}")
+    # else:
+    #     print(f"Shapiro-Wilk test | df1: {p_value1}")
         
-    if p_value2 < 0.05:
-        print(f"Shapiro-Wilk test | df2: not normally distributed | {p_value2}")
-    else:
-        print(f"Shapiro-Wilk test | df2: {p_value2}")
+    # if p_value2 < 0.05:
+    #     print(f"Shapiro-Wilk test | df2: not normally distributed | {p_value2}")
+    # else:
+    #     print(f"Shapiro-Wilk test | df2: {p_value2}")
 
 
     ### Anderson-Darling test
@@ -184,3 +184,8 @@ if __name__ == "__main__":
     else:
         print(f"Levene's test | Not significantly different variances | {p_value}")
         print(f"TRNK1: {trnk1(df1, df2, common)}")
+
+    mean_df1 = df1.iloc[:, 1].mean()
+    mean_df2 = df2.iloc[:, 1].mean()
+    change = (mean_df1 - mean_df2) / mean_df2 * 100
+    print(f"Mean: {mean_df1:.3f} | {mean_df2:.3f} | Change: {change:.2f}%")
