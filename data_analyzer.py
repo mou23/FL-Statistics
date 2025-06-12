@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import ttest_ind, mannwhitneyu, shapiro, probplot, levene, ks_2samp
 from itertools import product
+from scipy.stats import anderson_ksamp
 
 
 def create_histogram(technique, values1, values2, col):
@@ -41,10 +42,17 @@ def analyze_files(technique, file1, file2):
         values2 = data2[col].dropna()
 
         create_histogram(technique, values1, values2, col)
-        
+
+        result = anderson_ksamp([values1, values2])
+        print("Anderson_ksamp: ", result)
+        if result.significance_level < 0.05:
+            print("Different distribution")
+        else:
+            print("Same distribution")
+
 
 for technique in ["vsm", "buglocator", "bluir", "brtracer", "dreamloc"]:
-    for metric in ["average-precision", "reciprocal-rank"]:
-        file1 = f"{technique}/baseline-{metric}.csv"
-        file2 = f"{technique}/clean-{metric}.csv"
+    for metric in ["ap", "rr"]:
+        file1 = f"{technique}/full-baseline-{metric}.csv"
+        file2 = f"{technique}/full-clean-{metric}.csv"
         analyze_files(technique, file1, file2)
