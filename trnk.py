@@ -87,8 +87,7 @@ def trnk2(df1, df2, common):
     # S12 = np.cov(df1[df1.iloc[:, 0].isin(common)].iloc[:, 1], 
     #             df2[df2.iloc[:, 0].isin(common)].iloc[:, 1])[0, 1]
     
-    # v1 = (nA - 1) + ((nA + nB + nC - 1)/(nA + nB + 2 * nC)) * (nA + nB)
-    gamma = (S1_2 / n1 + S2_2 / n2) ** 2 / ((S1_2 / n1) ** 2 / (n1 - 1) + (S2_2 / n2) ** 2 / (n2 - 1))
+    gamma = ((S1_2 / n1 + S2_2 / n2) ** 2) / (((S1_2 / n1) ** 2) / (n1 - 1) + ((S2_2 / n2) ** 2) / (n2 - 1))
     v2 = (nC - 1) + ((gamma - nC + 1) / (nA + nB + 2 * nC)) * (nA + nB)
 
 
@@ -96,11 +95,53 @@ def trnk2(df1, df2, common):
     b = df2[df2.iloc[:, 0].isin(common)].iloc[:, 1]
     r = stats.pearsonr(get_ranked_list(a), get_ranked_list(b))[0]
 
-    trnk2 = (X1 - X2) / np.sqrt(S1_2 / n1 + S2_2 / n2 - 2*r * (S1 * S2 * nC) / (n1 * n2)) 
+    trnk2 = (X1 - X2) / math.sqrt(S1_2 / n1 + S2_2 / n2 - 2*r * (S1 * S2 * nC) / (n1 * n2)) 
     p_two_tailed = stats.t.sf(abs(trnk2), v2) * 2
     effect_size = trnk2 * 2 / math.sqrt(v2)
 
     return trnk2, p_two_tailed, effect_size_interpretation(effect_size)
+
+def trnk1(df1, df2, common):
+    nA = len(df1[~df1.iloc[:, 0].isin(common)])
+    nB = len(df2[~df2.iloc[:, 0].isin(common)])
+    nC = len(common)
+    n1 = len(df1)
+    n2 = len(df2)
+
+    combined_df = pd.concat([df1, df2], ignore_index=True)
+    df1 = get_df_ranked_list(combined_df, df1)
+    df2 = get_df_ranked_list(combined_df, df2)
+
+    X1 = sum(df1['rank']) / len(df1)
+    X2 = sum(df2['rank']) / len(df2)
+
+    # XA = sum(df1[~df1.iloc[:, 0].isin(common)].iloc[:, 1]) / nA
+    # XB = sum(df2[~df2.iloc[:, 0].isin(common)].iloc[:, 1]) / nB
+    # X1C = sum(df1[df1.iloc[:, 0].isin(common)].iloc[:, 1]) / nC
+    # X2C = sum(df2[df2.iloc[:, 0].isin(common)].iloc[:, 1]) / nC
+    S1_2 = stats.tvar(df1['rank'])
+    S2_2 = stats.tvar(df2['rank'])
+    S1 = math.sqrt(S1_2)
+    S2 = math.sqrt(S2_2)
+    SP = math.sqrt(((n1 - 1) * S1_2 + (n2 - 1) * S2_2) / ((n1 - 1) + (n2 - 1)))
+    # SA_2 = stats.tvar(df1[~df1.iloc[:, 0].isin(common)].iloc[:, 1])
+    # SB_2 = stats.tvar(df2[~df2.iloc[:, 0].isin(common)].iloc[:, 1])
+    # S1C_2 = stats.tvar(df1[df1.iloc[:, 0].isin(common)].iloc[:, 1])
+    # S2C_2 = stats.tvar(df2[df2.iloc[:, 0].isin(common)].iloc[:, 1])
+    # S12 = np.cov(df1[df1.iloc[:, 0].isin(common)].iloc[:, 1], 
+    #             df2[df2.iloc[:, 0].isin(common)].iloc[:, 1])[0, 1]
+    
+    v1 = (nC - 1) + ((nA + nB + nC - 1)/(nA + nB + 2 * nC)) * (nA + nB)
+
+    a = df1[df1.iloc[:, 0].isin(common)].iloc[:, 1]
+    b = df2[df2.iloc[:, 0].isin(common)].iloc[:, 1]
+    r = stats.pearsonr(get_ranked_list(a), get_ranked_list(b))[0]
+
+    trnk1 = (X1 - X2) / SP * math.sqrt(1 / n1 + 1 / n2 - 2*r * nC / (n1 * n2)) 
+    p_two_tailed = stats.t.sf(abs(trnk1), v1) * 2
+    effect_size = trnk1 * 2 / math.sqrt(v1)
+
+    return trnk1, p_two_tailed, effect_size_interpretation(effect_size), effect_size
 
 if __name__ == "__main__":
     df1 = pd.read_csv(sys.argv[1])
@@ -139,8 +180,7 @@ if __name__ == "__main__":
     statistic, p_value = stats.levene(df1.iloc[:, 1], df2.iloc[:, 1])
     if p_value < 0.05:
         print(f"Levene's test | Significantly different variances | {p_value}")
+        print(f"TRNK2: {trnk2(df1, df2, common)}")
     else:
         print(f"Levene's test | Not significantly different variances | {p_value}")
-
-    print("TRNK2:")
-    print(trnk2(df1, df2, common))
+        print(f"TRNK1: {trnk1(df1, df2, common)}")
