@@ -187,5 +187,5 @@ if __name__ == "__main__":
 
     mean_df1 = df1.iloc[:, 1].mean()
     mean_df2 = df2.iloc[:, 1].mean()
-    change = (mean_df1 - mean_df2) / mean_df2 * 100
+    change = (mean_df2 - mean_df1) / mean_df1 * 100
     print(f"Mean: {mean_df1:.3f} | {mean_df2:.3f} | Change: {change:.2f}%")
