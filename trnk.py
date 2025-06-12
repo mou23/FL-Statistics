@@ -99,7 +99,7 @@ def trnk2(df1, df2, common):
     p_two_tailed = stats.t.sf(abs(trnk2), v2) * 2
     effect_size = trnk2 * 2 / math.sqrt(v2)
 
-    return trnk2, p_two_tailed, effect_size_interpretation(effect_size), effect_size
+    return round(trnk2, 3), round(p_two_tailed, 3), effect_size_interpretation(effect_size), round(effect_size, 3)
 
 def trnk1(df1, df2, common):
     nA = len(df1[~df1.iloc[:, 0].isin(common)])
@@ -141,7 +141,7 @@ def trnk1(df1, df2, common):
     p_two_tailed = stats.t.sf(abs(trnk1), v1) * 2
     effect_size = trnk1 * 2 / math.sqrt(v1)
 
-    return trnk1, p_two_tailed, effect_size_interpretation(effect_size), effect_size
+    return round(trnk1, 3), round(p_two_tailed, 3), effect_size_interpretation(effect_size), round(effect_size, 3)
 
 if __name__ == "__main__":
     df1 = pd.read_csv(sys.argv[1])
