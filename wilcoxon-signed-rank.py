@@ -14,11 +14,6 @@ def calculate_statistic(arr1, arr2):
     z = abs(stats.norm.ppf(p_value/2))  # convert p-value to z-score
     effect_size = z / math.sqrt(n)
     
-    # print(f"\nWilcoxon signed-rank test:")
-    # print(f"Statistic: {statistic:.3f}")
-    # print(f"p-value: {p_value:.3f}")
-    # print(f"Effect size (r): {effect_size:.3f}")
-    
     # Interpret effect size
     if effect_size < 0.1:
         effect_interpretation = "negligible"
@@ -42,11 +37,10 @@ if __name__ == "__main__":
     print("="*80)
 
     # Create separate tables for each type-metric combination
-    for type_ in types:
-        for metric in metrics:
+    for metric in metrics:
+        for type_ in types:
             print(f"\n{type_.upper()} - {metric.upper()} COMPARISONS")
             results = []
-            print("-"*40)
             
             # Create all possible pairs of techniques
             for i, tech1 in enumerate(techniques):
@@ -73,8 +67,6 @@ if __name__ == "__main__":
                         print(f"Warning: Could not find file for comparison {tech1} vs {tech2}: {e}")
                         continue
 
-            print("-"*40)
-
             # Convert results to DataFrame and print as table
             results_df = pd.DataFrame(results)
             if not results_df.empty:
@@ -84,5 +76,3 @@ if __name__ == "__main__":
                 print("="*100)
             else:
                 print(f"\nNo valid comparisons found for {type_.upper()} - {metric.upper()}")
-            
-            print("\n" + "="*80)  # Add separator between tables
