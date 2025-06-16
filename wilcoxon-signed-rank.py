@@ -30,7 +30,8 @@ def calculate_statistic(arr1, arr2):
     # Perform Wilcoxon signed-rank test
     statistic, p_value = stats.wilcoxon(arr1, arr2)
     
-    effect_size = rank_biserial_from_arrays(arr1, arr2)
+    # effect_size = rank_biserial_from_arrays(arr1, arr2)
+    effect_size = z_score_based_correlation(p_value, len(arr1))
     
     # Interpret effect size
     if effect_size < 0.1:
