@@ -41,15 +41,16 @@ if __name__ == "__main__":
     print("WILCOXON SIGNED-RANK TEST RESULTS")
     print("="*80)
 
+    # Create separate tables for each type-metric combination
     for type_ in types:
-        print(f"\n{type_.upper()}")
-        results = []
-        print("-"*40)
-        
-        # Create all possible pairs of techniques
-        for i, tech1 in enumerate(techniques):
-            for tech2 in techniques[i+1:]:  # Only compare with techniques after current one
-                for metric in metrics:
+        for metric in metrics:
+            print(f"\n{type_.upper()} - {metric.upper()} COMPARISONS")
+            results = []
+            print("-"*40)
+            
+            # Create all possible pairs of techniques
+            for i, tech1 in enumerate(techniques):
+                for tech2 in techniques[i+1:]:  # Only compare with techniques after current one
                     file1 = f"{tech1}/full-{type_}-{metric}.csv"
                     file2 = f"{tech2}/full-{type_}-{metric}.csv"
                     
@@ -62,7 +63,6 @@ if __name__ == "__main__":
                         results.append({
                             'Technique 1': tech1.upper(),
                             'Technique 2': tech2.upper(),
-                            'Metric': metric.upper(),
                             'Statistic': f"{statistic:.3f}",
                             'p-value': f"{p_value:.3f}",
                             'Effect Size': f"{effect_size:.3f}",
@@ -70,17 +70,19 @@ if __name__ == "__main__":
                             'Significant': 'Yes' if p_value < 0.05 else 'No'
                         })
                     except FileNotFoundError as e:
-                        print(f"Warning: Could not find file for comparison {tech1} vs {tech2} for {metric}: {e}")
+                        print(f"Warning: Could not find file for comparison {tech1} vs {tech2}: {e}")
                         continue
 
-        print("-"*40)
+            print("-"*40)
 
-        # Convert results to DataFrame and print as table
-        results_df = pd.DataFrame(results)
-        if not results_df.empty:
-            print(f"\nWilcoxon Signed-Rank Test {type_.upper()} Results:")
-            print("="*120)  # Increased width for the wider table
-            print(results_df.to_string(index=False))
-            print("="*120)
-        else:
-            print(f"\nNo valid comparisons found for {type_.upper()}")
+            # Convert results to DataFrame and print as table
+            results_df = pd.DataFrame(results)
+            if not results_df.empty:
+                print(f"\nWilcoxon Signed-Rank Test Results for {type_.upper()} - {metric.upper()}:")
+                print("="*100)
+                print(results_df.to_string(index=False))
+                print("="*100)
+            else:
+                print(f"\nNo valid comparisons found for {type_.upper()} - {metric.upper()}")
+            
+            print("\n" + "="*80)  # Add separator between tables
