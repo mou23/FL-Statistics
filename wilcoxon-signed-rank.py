@@ -19,7 +19,7 @@ def rank_biserial_from_arrays(arr1, arr2):
     T = min(R1, R2)
 
     effect_size = (4 * (T - (R1 + R2)/2)) / (n * (n + 1))
-    return effect_size
+    return abs(effect_size)
 
 def z_score_based_correlation(p_value, n):
     z = abs(stats.norm.ppf(p_value/2))  # convert p-value to z-score
