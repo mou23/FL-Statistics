@@ -14,10 +14,10 @@ def calculate_statistic(arr1, arr2):
     z = abs(stats.norm.ppf(p_value/2))  # convert p-value to z-score
     effect_size = z / math.sqrt(n)
     
-    print(f"\nWilcoxon signed-rank test:")
-    print(f"Statistic: {statistic:.3f}")
-    print(f"p-value: {p_value:.3f}")
-    print(f"Effect size (r): {effect_size:.3f}")
+    # print(f"\nWilcoxon signed-rank test:")
+    # print(f"Statistic: {statistic:.3f}")
+    # print(f"p-value: {p_value:.3f}")
+    # print(f"Effect size (r): {effect_size:.3f}")
     
     # Interpret effect size
     if effect_size < 0.1:
