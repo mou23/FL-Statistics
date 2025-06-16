@@ -3,16 +3,34 @@ from scipy import stats
 import numpy as np
 import math
 import pandas as pd
-import sys
+from scipy.stats import rankdata
+
+def rank_biserial_from_arrays(arr1, arr2):
+    diff = np.array(arr1) - np.array(arr2)
+    non_zero_indices = diff != 0
+    diff = diff[non_zero_indices]
+    n = len(diff)
+    
+    abs_diff = np.abs(diff)
+    ranks = rankdata(abs_diff)
+
+    R1 = np.sum(ranks[diff > 0])  # sum of ranks for positive differences
+    R2 = np.sum(ranks[diff < 0])  # sum of ranks for negative differences
+    T = min(R1, R2)
+
+    effect_size = (4 * (T - (R1 + R2)/2)) / (n * (n + 1))
+    return effect_size
+
+def z_score_based_correlation(p_value, n):
+    z = abs(stats.norm.ppf(p_value/2))  # convert p-value to z-score
+    effect_size = z / math.sqrt(n)
+    return effect_size
 
 def calculate_statistic(arr1, arr2):
     # Perform Wilcoxon signed-rank test
     statistic, p_value = stats.wilcoxon(arr1, arr2)
     
-    # Calculate effect size (r = Z/sqrt(N))
-    n = len(arr1)  # sample size
-    z = abs(stats.norm.ppf(p_value/2))  # convert p-value to z-score
-    effect_size = z / math.sqrt(n)
+    effect_size = rank_biserial_from_arrays(arr1, arr2)
     
     # Interpret effect size
     if effect_size < 0.1:
