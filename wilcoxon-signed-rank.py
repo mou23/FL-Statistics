@@ -40,7 +40,7 @@ def calculate_statistic(arr1, arr2):
     # effect_size = rank_biserial_from_arrays(arr1, arr2)
 
     n = np.sum(np.array(arr1) != np.array(arr2))
-    effect_size = z_score_based_correlation_gpt(p_value, n)
+    effect_size = z_score_based_correlation_cursor(p_value, n)
     
     # Interpret effect size
     if effect_size < 0.1:
